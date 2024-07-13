@@ -1,8 +1,22 @@
-
-<div class="btn-group" role="group" aria-label="Basic example">
-  <button type="button" class="btn btn-primary">Left</button>
-  <button type="button" class="btn btn-primary">Middle</button>
-  <button type="button" class="btn btn-primary">Right</button>
+<!-- bootstrap input field with send button for messaging -->
+<div class="input-group mb-3">
+  <input type="text"
+         class="form-control"
+         placeholder="Recipient's username"
+         aria-label="Recipient's username"
+         aria-describedby="button-addon2"
+         [(ngModel)]="instructions">
+  <div class="input-group-append">
+    <button class="btn btn-outline-secondary"
+            type="button"
+            id="button-sendmessage"
+            (click)="startDebate()">
+      Discuss!
+    </button>
+  </div>
 </div>
 
-<router-outlet />
+<!-- empty bootstrap ul list to hold text messages -->
+<ul class="list-group" id="messages"></ul>
+
+{{status}}
