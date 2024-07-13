@@ -12,12 +12,13 @@ import ollama from 'ollama'
 })
 export class AppComponent {
 
-  private roleBob: string = 'You are Bob. You are an expert Java developer. ' +
-    'Do not mention your role or name. Answer in short sentences. You are talking to Alice, a Product Owner';
-    // 'You are having a chat and are answering to the following: ';
-  private roleAlice: string = 'You are Alice. You are an expert Product Owner. You are talking to Bob, a Java Developer'+
-    'Do not mention your role or name. Answer in short sentences. ';
-    // 'You are having a chat and are answering to the following: ';
+  private promptFrame: string = ' Do not mention your role or name. Answer in short sentences. You are talking to ';
+
+  protected roleBob: string = 'You are Bob. You are an expert Java developer. You are making sure that the software is implemented correctly.';
+  protected roleAlice: string = 'You are Alice. You are an expert Product Owner. You are making sure that the software covers the domain in discussion.';
+
+  private contextBob: number[] = [];
+  private contextAlice: number[] = [];
 
   protected status: string = 'idle';
 
@@ -29,24 +30,28 @@ export class AppComponent {
   }
 
   async sendMessageAlice() {
-    const response = await this.getOllamaResponse('Alice', this.roleAlice);
-    this.response = response.message.content;
+    const response = await this.getOllamaResponse('Alice', this.roleAlice  + this.promptFrame + ' Bob');
+    this.response = response.response;
+    this.contextAlice = response.context;
     this.addMessage('Alice: ' + this.response);
     this.sendMessageBob();
   }
 
   async sendMessageBob() {
-    const response = await this.getOllamaResponse('Bob', this.roleBob);
-    this.response = response.message.content;
+    const response = await this.getOllamaResponse('Bob', this.roleBob + this.promptFrame + ' Alice');
+    this.response = response.response;
+    this.contextBob = response.context;
     this.addMessage('Bob: ' + this.response);
     this.sendMessageAlice();
   }
 
   private async getOllamaResponse(name: string, role: string) {
     this.status = name + ' is typing...';
-    return await ollama.chat({
+    return await ollama.generate({
       model: 'llama3',
-      messages: [{role: 'user', content: role + ' ' + this.instructions + ' ' + this.response}],
+      prompt: role + ' ' + this.instructions + ' ' + this.response,
+      context: name === 'Alice' ? this.contextAlice : this.contextBob,
+      stream: false,
     });
   }
 

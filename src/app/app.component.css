@@ -1,0 +1,4 @@
+.full-width {
+  width: 100%;
+  box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+}
